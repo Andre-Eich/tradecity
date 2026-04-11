@@ -119,6 +119,56 @@
       cursor: pointer;
       user-select: none;
       z-index: 10;
+      width: 200px;
+      height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* KI-Städte: kleinerer Rahmen */
+    .city:not(#base) {
+      width: 160px;
+      height: 140px;
+    }
+
+    /* Mittlere KI-Städte: kleiner */
+    .city#mittel-stadt_1,
+    .city#mittel-stadt_2,
+    .city#mittel-stadt_3,
+    .city#mittel-stadt_4,
+    .city#mittel-stadt_5 {
+      width: 130px;
+      height: 110px;
+    }
+
+    /* Kleine Dörfer: noch kleiner */
+    .city#dorf_1,
+    .city#dorf_2,
+    .city#dorf_3,
+    .city#dorf_4,
+    .city#dorf_5 {
+      width: 100px;
+      height: 90px;
+    }
+
+    .city::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      pointer-events: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      opacity: 0.1;
+    }
+
+    .city:hover::after,
+    .city.selected::after {
+      border-color: rgba(255,255,255,0.9);
+      box-shadow: 0 0 18px rgba(255,255,255,0.18);
+      opacity: 1;
+      display: block !important;
     }
 
     .city-wrap {
@@ -140,6 +190,33 @@
 
     .city.selected .city-icon {
       filter: drop-shadow(0 0 8px rgba(240,188,32,0.9));
+    }
+
+    body.map-image-loaded .city-icon {
+      opacity: 0 !important;
+    }
+
+    body.map-image-loaded .city::after {
+      border: 3px solid rgba(255,255,255,0.1) !important;
+      box-shadow: none !important;
+      display: block !important;
+      opacity: 0.1;
+    }
+
+    body.map-image-loaded .city:hover::after,
+    body.map-image-loaded .city.selected::after {
+      border-color: rgba(240,200,60,0.95) !important;
+      box-shadow: 0 0 24px rgba(240,200,60,0.5) !important;
+      opacity: 1;
+    }
+
+    body.map-image-loaded .city-label {
+      display: none !important;
+    }
+
+    body.map-image-loaded #roads,
+    body.map-image-loaded #territory {
+      display: none !important;
     }
 
     .city-svg {
@@ -178,37 +255,7 @@
       transition: width 0.4s ease;
     }
 
-    .city-dual-bars {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      margin: 4px auto 0;
-      width: 44px;
-    }
-
-    .city-mini-bar {
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.12);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .city-mini-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.4s ease;
-    }
-
-    .city-mini-bar-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 8px;
-      color: rgba(255,255,255,0.35);
-      margin-bottom: 1px;
-      font-family: 'Inter', sans-serif;
-      letter-spacing: 0.03em;
-    }
+    /* Wall and garrison bars removed */
 
     .city-income-badge {
       background: rgba(15,20,25,0.85);
@@ -333,6 +380,18 @@
       flex: 1;
       min-height: 0;
     }
+
+    /* Feste 65 / 35 Aufteilung – überschreibt .panel.expanded durch höhere Spezifität */
+    #panel1.expanded { flex: 65 1 0; }
+    #panel3.expanded { flex: 35 1 0; }
+
+    /* Panel-Header ohne Toggle: kein Pointer, kein Hover */
+    #panel1 .panel-header,
+    #panel3 .panel-header {
+      cursor: default;
+    }
+    #panel1 .panel-header:hover,
+    #panel3 .panel-header:hover { background: none; }
 
     .panel:last-child { border-bottom: none; }
 
@@ -1139,4 +1198,300 @@
     .panel:last-child { overflow: hidden; }
     .foreign-layout, .foreign-detail { overflow-y:auto; min-height:0; }
 
-  
+    /* ── PANEL 1 – NEUE STAT-KARTEN ────────────────────── */
+    .p1-section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .scp1 {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 9px;
+      padding: 9px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .scp1-hdr {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .scp1-ico { font-size: 18px; flex-shrink: 0; }
+
+    .scp1-name {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .scp1-vals {
+      margin-left: auto;
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+    }
+
+    /* Gebäude-Icons */
+    .bldg-icons-p1 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      margin-top: 3px;
+    }
+
+    .bldg-ic-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 7px;
+      padding: 7px 4px 5px;
+    }
+
+    .bldg-ic-emoji { font-size: 18px; line-height: 1; }
+
+    .bldg-ic-lbl {
+      font-size: 10px;
+      color: var(--text-soft);
+      text-align: center;
+    }
+
+    .bldg-ic-cell .b-status {
+      font-size: 11px;
+      font-family: 'Inter', sans-serif;
+      min-width: 0;
+      text-align: center;
+    }
+
+    /* Ressourcen-Zeilen */
+    .res-p1 { display: flex; flex-direction: column; gap: 3px; }
+
+    .res-p1-hdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .res-p1-hdr span:last-child { color: var(--text-soft); font-size: 12px; }
+
+    .res-p1-bar {
+      height: 5px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .res-p1-foot {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    /* ── Einwohner: Schicht-Bevölkerungs-Badges ─────────── */
+    .schicht-pop-badges {
+      display: flex;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .spop-badge {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 6px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-soft);
+      white-space: nowrap;
+    }
+
+    /* ── Steuersatz Schicht-Badges ──────────────────────── */
+    .tax-schicht-badges {
+      display: flex;
+      gap: 5px;
+      width: 100%;
+    }
+
+    .tax-schicht-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 6px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: var(--text-soft);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex: 1;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .tax-schicht-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+    /* Stufe 0 = Niedrig → grün */
+    .tax-schicht-btn[data-lvl="0"] { border-color: rgba(76,175,125,0.5); color: var(--good); background: rgba(76,175,125,0.12); }
+    /* Stufe 1 = Mittel → gold */
+    .tax-schicht-btn[data-lvl="1"] { border-color: rgba(212,160,23,0.5); color: var(--gold-bright); background: rgba(212,160,23,0.12); }
+    /* Stufe 2 = Hoch → rot */
+    .tax-schicht-btn[data-lvl="2"] { border-color: rgba(192,57,43,0.6); color: #e07060; background: rgba(192,57,43,0.12); }
+
+    /* ── Gebäude: nur sichtbar wenn gebaut ──────────────── */
+    .bldg-ic-cell {
+      display: none;   /* standardmäßig versteckt */
+    }
+    .bldg-ic-cell:has(.b-status.done),
+    .bldg-ic-cell.in-queue {
+      display: flex;   /* sichtbar wenn gebaut oder in Bau */
+    }
+
+    /* Build-Fortschrittsbalken */
+    .bldg-ic-bar {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .bldg-ic-bar-fill {
+      height: 100%;
+      background: var(--gold-bright);
+      border-radius: 2px;
+      transition: width 0.5s linear;
+    }
+
+    /* ── 2×2 Ressourcen-Grid (Land & Vorräte) ──────────── */
+    .res-grid-p1 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .res-card-p1 {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 7px;
+      padding: 7px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .res-card-p1.res-card-inactive {
+      opacity: 0.4;
+    }
+
+    .res-card-hdr {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .res-card-ico { font-size: 14px; flex-shrink: 0; }
+
+    .res-card-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .res-card-count {
+      font-size: 11px;
+      color: var(--text-soft);
+      white-space: nowrap;
+      font-family: 'Cinzel', serif;
+    }
+
+    .res-card-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .res-card-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 3px;
+    }
+
+    .res-card-hint {
+      font-size: 10px;
+      color: var(--text-soft);
+      line-height: 1.3;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .res-card-rate {
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      color: var(--good);
+      font-family: 'Cinzel', serif;
+    }
+
+    /* KI-Städte 2-Spalten-Grid */
+    .city-cards-p1 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .city-card-p1 {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .city-card-p1-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .city-card-p1-type {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .city-card-p1.trade  { border-color: rgba(212,160,23,0.25); }
+    .city-card-p1.war    { border-color: rgba(192,57,43,0.3); }
+    .city-card-p1.income { border-color: rgba(76,175,125,0.25); }
+

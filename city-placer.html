@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeCity - City Placer Tool</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Inter', sans-serif;
+      background: #1a1a1a;
+      color: #e8dcc8;
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+    }
+    
+    .container {
+      display: flex;
+      gap: 20px;
+      flex: 1;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .canvas-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #mapContainer {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 2px solid rgba(212,160,23,0.5);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #0a0a0a;
+      cursor: crosshair;
+    }
+
+    #mapImage {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .city-marker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      border: 2px solid rgba(240,188,32,0.8);
+      background: rgba(240,188,32,0.3);
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+
+    .city-marker:hover {
+      width: 16px;
+      height: 16px;
+      background: rgba(240,188,32,0.6);
+      box-shadow: 0 0 10px rgba(240,188,32,0.8);
+    }
+
+    .city-marker.selected {
+      width: 18px;
+      height: 18px;
+      background: rgba(76,175,125,0.6);
+      border-color: rgba(76,175,125,0.9);
+      box-shadow: 0 0 15px rgba(76,175,125,0.8);
+    }
+
+    .info-section {
+      flex: 0 0 350px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: rgba(15,20,25,0.7);
+      border: 1px solid rgba(212,160,23,0.3);
+      border-radius: 8px;
+      padding: 20px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .info-header {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gold-bright);
+      border-bottom: 1px solid rgba(212,160,23,0.3);
+      padding-bottom: 10px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      color: rgba(232,220,200,0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .input-group input, .input-group select {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #e8dcc8;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: rgba(240,188,32,0.5);
+      background: rgba(240,188,32,0.1);
+    }
+
+    button {
+      background: rgba(212,160,23,0.15);
+      border: 1px solid rgba(212,160,23,0.4);
+      color: #f0bc20;
+      padding: 10px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: rgba(212,160,23,0.25);
+      border-color: rgba(212,160,23,0.6);
+    }
+
+    button.danger {
+      background: rgba(192,57,43,0.15);
+      border-color: rgba(192,57,43,0.4);
+      color: #e07060;
+    }
+
+    button.danger:hover {
+      background: rgba(192,57,43,0.25);
+      border-color: rgba(192,57,43,0.6);
+    }
+
+    .city-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .city-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .city-item:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .city-item.active {
+      background: rgba(212,160,23,0.15);
+      border-color: rgba(212,160,23,0.4);
+      color: #f0bc20;
+    }
+
+    .city-item-name {
+      font-weight: 600;
+      color: #f0bc20;
+      margin-bottom: 4px;
+    }
+
+    .city-item-coords {
+      color: rgba(232,220,200,0.6);
+      font-size: 10px;
+    }
+
+    .output-code {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(212,160,23,0.3);
+      border-radius: 4px;
+      padding: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      color: rgba(232,220,200,0.8);
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .button-group button {
+      flex: 1;
+    }
+
+    .coords-display {
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(212,160,23,0.3);
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      text-align: center;
+      color: #f0bc20;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="canvas-section">
+      <div id="mapContainer">
+        <img id="mapImage" src="map.png" alt="TradeCity Map">
+      </div>
+      <div class="coords-display" id="coordsDisplay">Klicke auf die Karte zum Platzieren | xr: —, yr: —</div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-header">🏘️ City Placer</div>
+
+      <div class="input-group">
+        <label>Stadt-Name</label>
+        <input type="text" id="cityName" placeholder="z.B. Waldmark">
+      </div>
+
+      <div class="input-group">
+        <label>Stadt-Typ</label>
+        <select id="cityType">
+          <option value="base">Base (Spieler)</option>
+          <option value="ki_large">KI - Groß (800+ Einw.)</option>
+          <option value="ki_medium">KI - Mittel (500-700 Einw.)</option>
+          <option value="ki_small">KI - Klein (150-300 Einw.)</option>
+        </select>
+      </div>
+
+      <button onclick="addCityAtClick()">📍 Nächstes Klick = Platzieren</button>
+
+      <div class="info-header" style="margin-top: 15px;">📋 Platzierte Städte</div>
+
+      <div class="city-list" id="cityList"></div>
+
+      <button class="danger" onclick="clearAll()">Alle löschen</button>
+
+      <div class="info-header" style="margin-top: 15px;">💾 Code exportieren</div>
+
+      <textarea class="output-code" id="outputCode" readonly placeholder="Code wird hier angezeigt..."></textarea>
+
+      <div class="button-group">
+        <button onclick="copyToClipboard()">📋 Kopieren</button>
+        <button onclick="downloadAsJSON()">⬇️ JSON</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let cities = [];
+    let pendingCity = null;
+    let selectedCityIndex = null;
+
+    const mapContainer = document.getElementById('mapContainer');
+    const cityList = document.getElementById('cityList');
+    const outputCode = document.getElementById('outputCode');
+    const coordsDisplay = document.getElementById('coordsDisplay');
+
+    mapContainer.addEventListener('click', (e) => {
+      if (!pendingCity) return;
+
+      const rect = mapContainer.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const xr = (x / rect.width).toFixed(2);
+      const yr = (y / rect.height).toFixed(2);
+
+      const newCity = {
+        name: document.getElementById('cityName').value || 'Unnamed',
+        type: document.getElementById('cityType').value,
+        xr: parseFloat(xr),
+        yr: parseFloat(yr),
+        x: Math.round(x),
+        y: Math.round(y)
+      };
+
+      cities.push(newCity);
+      pendingCity = null;
+      document.getElementById('cityName').value = '';
+      document.getElementById('cityType').value = 'ki_medium';
+
+      render();
+
+      mapContainer.style.cursor = 'crosshair';
+    });
+
+    mapContainer.addEventListener('mousemove', (e) => {
+      if (!pendingCity) return;
+
+      const rect = mapContainer.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const xr = (x / rect.width).toFixed(2);
+      const yr = (y / rect.height).toFixed(2);
+
+      coordsDisplay.textContent = `xr: ${xr}, yr: ${yr}`;
+    });
+
+    function addCityAtClick() {
+      if (!document.getElementById('cityName').value.trim()) {
+        alert('Bitte Stadt-Namen eingeben!');
+        return;
+      }
+      pendingCity = true;
+      mapContainer.style.cursor = 'crosshair';
+      coordsDisplay.textContent = 'Klicke auf die Karte zum Platzieren...';
+    }
+
+    function deleteCity(index) {
+      cities.splice(index, 1);
+      selectedCityIndex = null;
+      render();
+    }
+
+    function selectCity(index) {
+      selectedCityIndex = selectedCityIndex === index ? null : index;
+      render();
+    }
+
+    function clearAll() {
+      if (confirm('Wirklich alle Städte löschen?')) {
+        cities = [];
+        selectedCityIndex = null;
+        render();
+      }
+    }
+
+    function render() {
+      // Clear markers
+      document.querySelectorAll('.city-marker').forEach(m => m.remove());
+
+      // Draw markers
+      cities.forEach((city, i) => {
+        const marker = document.createElement('div');
+        marker.className = 'city-marker' + (i === selectedCityIndex ? ' selected' : '');
+        marker.style.left = (city.xr * 100) + '%';
+        marker.style.top = (city.yr * 100) + '%';
+        marker.onclick = (e) => {
+          e.stopPropagation();
+          selectCity(i);
+        };
+        mapContainer.appendChild(marker);
+      });
+
+      // Update list
+      cityList.innerHTML = cities.map((city, i) => `
+        <div class="city-item ${i === selectedCityIndex ? 'active' : ''}" onclick="selectCity(${i})">
+          <div class="city-item-name">${city.name}</div>
+          <div class="city-item-coords">xr: ${city.xr.toFixed(2)}, yr: ${city.yr.toFixed(2)}</div>
+          <button class="danger" style="width: 100%; margin-top: 6px; padding: 4px;" onclick="deleteCity(${i}); event.stopPropagation();">🗑️ Löschen</button>
+        </div>
+      `).join('');
+
+      // Update code
+      updateCode();
+    }
+
+    function updateCode() {
+      const code = cities.map(city => {
+        let id = city.name.toLowerCase().replace(/\s+/g, '_');
+        let pop, tradePot;
+        
+        switch(city.type) {
+          case 'base':
+            id = 'base';
+            pop = 'state.population';
+            tradePot = '0';
+            break;
+          case 'ki_large':
+            pop = Math.floor(Math.random() * 200) + 750;
+            tradePot = Math.floor(Math.random() * 50) + 75;
+            break;
+          case 'ki_medium':
+            pop = Math.floor(Math.random() * 200) + 500;
+            tradePot = Math.floor(Math.random() * 30) + 40;
+            break;
+          case 'ki_small':
+            pop = Math.floor(Math.random() * 100) + 150;
+            tradePot = Math.floor(Math.random() * 20) + 15;
+            break;
+        }
+
+        return `{ id: '${id}', name: '${city.name}', xr: ${city.xr.toFixed(2)}, yr: ${city.yr.toFixed(2)}, population: ${pop}, tradePotential: ${tradePot}, isEnemy: false },`;
+      }).join('\n      ');
+
+      outputCode.value = code;
+    }
+
+    function copyToClipboard() {
+      outputCode.select();
+      document.execCommand('copy');
+      alert('Code kopiert!');
+    }
+
+    function downloadAsJSON() {
+      const json = JSON.stringify(cities, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cities.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    render();
+  </script>
+</body>
+</html>
