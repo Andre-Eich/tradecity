@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trade City</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div id="app">
+  <div id="map">
+    <canvas id="mapCanvas"></canvas>
+    <svg id="territory"></svg>
+    <svg id="roads"></svg>
+    <div id="cities"></div>
+    <div id="travelers"></div>
+  </div>
+
+  <div id="infoBox">
+    <!-- Panel 1: Basis-Stats -->
+    <div class="panel expanded" id="panel1">
+      <div class="panel-header" onclick="togglePanel('panel1')">
+        <span class="panel-header-title">⚔ Dein Reich</span>
+        <span class="panel-chevron">▼</span>
+      </div>
+      <div id="panel1Mini" style="display:none;padding:0 16px 8px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;">
+          <div class="mini-box"><div class="mini-label">Gold</div><div class="mini-val gold-val" id="miniGold">0</div></div>
+          <div class="mini-box"><div class="mini-label">Bürger</div><div class="mini-val" id="miniPop">0</div></div>
+          <div class="mini-box"><div class="mini-label">Gold/min</div><div class="mini-val good-val" id="miniGps">0</div></div>
+          <div class="mini-box" id="miniArmyBox"><div class="mini-label">⚔ Armee</div><div class="mini-val" id="miniArmy">—</div></div>
+        </div>
+        <div style="margin-top:5px;display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-soft);">
+          <span>🌾 Nahrungsvorrat</span>
+          <div style="flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;">
+            <div id="miniSupplyBar" style="height:100%;border-radius:2px;width:25%;transition:width 0.3s,background 0.3s;background:var(--good);"></div>
+          </div>
+          <span id="miniSupplyPct" style="min-width:28px;text-align:right;">0%</span>
+        </div>
+      </div>
+      <div class="panel-body" id="panel1-body">
+      <div style="display:flex;flex-direction:column;gap:5px;">
+
+        <!-- Gold + Steuersatz kombiniert -->
+        <div class="build-row-item" style="flex-direction:column;align-items:stretch;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="b-info">
+              <div class="b-name">Gold</div>
+              <div id="goldBreakdown" style="font-size:15px;color:var(--text-soft);margin-top:2px;"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+              <div style="font-size:24px;font-family:'Cinzel',serif;color:var(--gold-bright);" id="goldValue">0</div>
+              <div style="font-size:16px;font-family:'Cinzel',serif;color:var(--good);" id="gpsValue">0/min</div>
+            </div>
+          </div>
+          <div class="tax-control" style="margin-top:2px;">
+            <div class="tax-label-row">
+              <span class="t-name">⚖ Steuersatz</span>
+              <span class="t-factor" id="taxFactorLabel">100%</span>
+            </div>
+            <div class="tax-steps" id="taxSteps">
+              <button class="tax-step t-low"  data-level="0">Niedrig</button>
+              <button class="tax-step active-tax" data-level="1">Normal</button>
+              <button class="tax-step t-high" data-level="2">Hoch</button>
+              <button class="tax-step t-high" data-level="3">Sehr<br>hoch</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bürger -->
+        <div class="build-row-item">
+          <div class="b-info">
+            <div class="b-name">Bürger</div>
+            <div id="popBreakdown" style="font-size:15px;color:var(--text-soft);margin-top:3px;display:none;"></div>
+            <div id="traderPlanControl" style="display:none;"></div>
+          </div>
+          <div class="b-status" style="font-size:24px;font-family:'Cinzel',serif;min-width:52px;text-align:right;flex-shrink:0;" id="popValue">0</div>
+        </div>
+
+        <!-- Armee -->
+        <div class="build-row-item" id="armyCard">
+          <div class="b-icon">⚔</div>
+          <div class="b-info">
+            <div class="b-name">Armee</div>
+            <div id="armyPlanControl" style="display:none;margin-top:4px;"></div>
+            <div id="mercBtn" style="display:none;margin-top:5px;">
+              <button id="hireMercBtn" style="background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.35);border-radius:6px;color:var(--gold-bright);font-size:13px;padding:3px 9px;cursor:pointer;white-space:nowrap;">
+                +10 Söldner · 35 Gold
+              </button>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="font-size:24px;font-family:'Cinzel',serif;color:#adc0b4;" id="armyValue">0/0</div>
+            <button id="recruitToggle" title="Rekrutierung" style="background:none;border:none;cursor:pointer;font-size:20px;padding:0;line-height:1;">▶</button>
+          </div>
+        </div>
+
+        <!-- Nahrungsvorrat -->
+        <div class="build-row-item" style="padding:8px 12px;flex-direction:column;gap:5px;align-items:stretch;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:18px;font-weight:700;">🌾 Nahrungsvorrat</span>
+            <span style="font-size:16px;color:var(--text-soft);"><span id="foodCurrent">0</span> / <span id="foodMax">200</span></span>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;">
+            <div id="supplyFill" style="height:100%;width:25%;border-radius:3px;background:var(--good);transition:width 0.4s,background 0.3s;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:15px;color:var(--text-soft);">
+            <span id="supplyPct">50%</span>
+            <span id="foodBilanz" style="font-weight:600;">+0/min</span>
+          </div>
+          <div id="foodConsumptionRow" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:13px;margin-top:2px;"></div>
+        </div>
+
+        <!-- Rohstofflager -->
+        <div class="build-row-item" style="padding:8px 12px;flex-direction:column;gap:5px;align-items:stretch;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:18px;font-weight:700;">⛏ Rohstofflager</span>
+            <span style="font-size:16px;color:var(--text-soft);"><span id="goodsCurrent">0</span> / <span id="goodsMax">500</span></span>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;">
+            <div id="goodsFill" style="height:100%;width:0%;border-radius:3px;background:#c8a870;transition:width 0.4s;"></div>
+          </div>
+        </div>
+
+        <!-- Handelswaren-Lager -->
+        <div class="build-row-item" style="padding:8px 12px;flex-direction:column;gap:5px;align-items:stretch;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:18px;font-weight:700;">🏺 Handelswaren</span>
+            <span style="font-size:16px;color:var(--text-soft);"><span id="wealthCurrent">0</span> / <span id="wealthMax">250</span></span>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;">
+            <div id="wealthFill" style="height:100%;width:0%;border-radius:3px;background:#c9a0dc;transition:width 0.4s;"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Versteckte Labels für JS -->
+      <span id="farmerLabel" style="display:none">0</span>
+      <span id="traderLabel" style="display:none">0</span>
+      <span id="soldierLabel" style="display:none">0</span>
+      <!-- Wachstumsfaktor -->
+      <div style="font-size:15px; color:var(--text-soft); display:flex; justify-content:space-between;">
+        <span>Wachstumsfaktor</span>
+        <span id="growthLabel" style="color:var(--good); font-weight:600;">0%</span>
+      </div>
+    </div>
+
+    <!-- Panel 2: Gebäude & Queue -->
+    <div class="panel" id="panel2">
+      <div class="panel-header" onclick="togglePanel('panel2')">
+        <span class="panel-header-title">🏗 Bauwesen</span>
+        <span class="panel-chevron">▼</span>
+      </div>
+      <div id="panel2Mini" style="display:none;padding:0 16px 8px;">
+        <div style="display:flex;flex-wrap:wrap;gap:5px;" id="buildMiniBoxes"></div>
+        <div id="buildQueueMini" style="font-size:10px;color:var(--warn);margin-top:4px;font-family:'Inter',sans-serif;"></div>
+      </div>
+      <div class="panel-body hidden" id="panel2-body">
+      <div class="mid-panel-inner" style="display:flex;flex-direction:column;gap:6px;flex:1;min-height:0;overflow:hidden;">
+        <div class="build-grid">
+          <div class="build-row-item">
+            <div class="b-icon">🪣</div>
+            <div class="b-info">
+              <div class="b-name">Rohstoffmine</div>
+              <div class="b-meta" id="mineMeta">100G · 10s · max. 2 Minenarbeiter-Trupps</div>
+            </div>
+            <div class="b-status" id="wellStatus">—</div>
+            <button class="b-action-btn" id="wellBtn">Bauen</button>
+          </div>
+          <div class="build-row-item" id="irrigationRow">
+            <div class="b-icon">💧</div>
+            <div class="b-info">
+              <div class="b-name">Bewässerung</div>
+              <div class="b-meta" id="irrigationMeta">100G · 10s · +15% Nahrungsproduktion</div>
+            </div>
+            <div class="b-status" id="irrigationStatus">—</div>
+            <button class="b-action-btn" id="irrigationBtn">Bauen</button>
+          </div>
+          <div class="build-row-item">
+            <div class="b-icon">⛪</div>
+            <div class="b-info">
+              <div class="b-name" id="churchBtnName">Kirche</div>
+              <div class="b-meta" id="churchBtnMeta">150G · Einfach +250 / Prunkvoll 250G +300–500</div>
+            </div>
+            <div class="b-status" id="churchStatus">0/3</div>
+            <button class="b-action-btn" id="churchBtn">Bauen</button>
+          </div>
+          <div class="build-row-item" id="guildRow">
+            <div class="b-icon">🏪</div>
+            <div class="b-info">
+              <div class="b-name">Handelsgilde</div>
+              <div class="b-meta" id="guildMeta">100G · 15s · max. 2 Trupps à 25 Händler</div>
+            </div>
+            <div class="b-status" id="guildStatus">—</div>
+            <button class="b-action-btn" id="guildBtn">Bauen</button>
+          </div>
+          <div class="build-row-item" id="craftGuildRow">
+            <div class="b-icon">🔧</div>
+            <div class="b-info">
+              <div class="b-name">Handwerkergilde</div>
+              <div class="b-meta" id="craftGuildMeta">100G · 10s · max. 1 Stätte à 15 Handwerker</div>
+            </div>
+            <div class="b-status" id="craftGuildStatus">—</div>
+            <button class="b-action-btn" id="craftGuildBtn">Bauen</button>
+          </div>
+          <div class="build-row-item">
+            <div class="b-icon">🌾</div>
+            <div class="b-info">
+              <div class="b-name">Lagerausbau</div>
+              <div class="b-meta" id="granaryMeta">200G · 30s · Alle Lager ×2</div>
+            </div>
+            <div class="b-status" id="granaryStatus">—</div>
+            <button class="b-action-btn" id="granaryBtn">Bauen</button>
+          </div>
+
+          <div class="build-row-item">
+            <div class="b-icon">⚔</div>
+            <div class="b-info">
+              <div class="b-name">Kaserne</div>
+              <div class="b-meta" id="barracksMeta">200G · 15s · 75 max Armee</div>
+            </div>
+            <div class="b-status" id="barracksStatus">—</div>
+            <button class="b-action-btn" id="barracksBtn">Bauen</button>
+          </div>
+        </div>
+        <!-- Status wird jetzt direkt in den Buttons angezeigt -->
+        <span id="wellCount" style="display:none">0</span>
+        <span id="churchCount" style="display:none">0</span>
+        <span id="guildCount" style="display:none"></span>
+        <span id="granaryCount" style="display:none"></span>
+        <span id="barracksCount" style="display:none"></span>
+        <div class="queue-area" id="queueWrap"></div>
+      </div><!-- mid-panel-inner -->
+      </div><!-- panel-body -->
+    </div>
+
+    <!-- Panel 3: Fremdstädte -->
+    <div class="panel" id="panel3">
+      <div class="panel-header" onclick="togglePanel('panel3')">
+        <span class="panel-header-title">🗺 Fremde Städte</span>
+        <span class="panel-chevron">▼</span>
+      </div>
+      <div id="panel3Mini" style="display:none;padding:0 16px 8px;">
+        <div style="display:flex;flex-wrap:wrap;gap:5px;" id="partnerMiniBoxes"></div>
+      </div>
+      <div class="panel-body hidden" id="panel3-body">
+      <div class="foreign-layout" style="display:flex;flex-direction:column;gap:8px;flex:1;min-height:0;overflow:hidden;">
+        <div class="city-list" id="foreignCityList"></div>
+        <div class="foreign-detail" id="foreignPanel">
+          <div class="hint-text">Klicke auf eine Stadt auf der Karte</div>
+          </div>
+        </div>
+      </div><!-- foreign-layout -->
+      <div id="attackSection"></div>
+      </div><!-- panel-body -->
+    </div>
+  </div>
+  <div id="cheatButtons">
+    <button id="cheatGold">+100 Gold</button>
+    <button id="cheatPop">+100 Bevölkerung</button>
+    <button id="cheatBuild">Build fertig</button>
+    <button id="cheatArmy">+50 Soldaten</button>
+    <button id="cheatSpeed">⏩ 3x Speed</button>
+  </div>
+</div>
+
+
+  <script src="game.js"></script>
+
+</body>
+</html>
