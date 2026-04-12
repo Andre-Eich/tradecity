@@ -72,20 +72,79 @@
           <div class="scp1-hdr">
             <span class="scp1-ico">👥</span>
             <span class="scp1-name">Einwohner</span>
-            <span id="popValue" style="margin-left:auto;font-size:22px;font-family:'Cinzel',serif;">0</span>
           </div>
-          <div class="schicht-pop-badges">
+
+          <!-- Obere Badge-Reihe: je 1/3 pro Schicht -->
+          <div class="pop-schicht-badges">
+            <div class="pop-schicht-badge">
+              <div class="pop-schicht-badge-title">👥 Einfache</div>
+              <div class="pop-schicht-badge-count" id="einfacheCount">0</div>
+              <div class="pop-schicht-badge-sub" id="idleCount">0 suchen Job</div>
+            </div>
+            <div class="pop-schicht-badge">
+              <div class="pop-schicht-badge-title">👥 Mittel</div>
+              <div class="pop-schicht-badge-count" id="mittelCount">0</div>
+            </div>
+            <div class="pop-schicht-badge">
+              <div class="pop-schicht-badge-title">👑 Ober</div>
+              <div class="pop-schicht-badge-count" id="oberCount">0</div>
+            </div>
+          </div>
+
+          <!-- Untere 3-Spalten-Aufschlüsselung -->
+          <div class="pop-detail-cols">
+            <!-- Spalte 1: Einfache Leute -->
+            <div class="pop-detail-col">
+              <div class="pop-detail-col-title">Einfache</div>
+              <div class="pop-detail-row">
+                <span class="pop-detail-row-label">🌾 Bauern</span>
+                <span class="pop-detail-row-val" id="farmerCount2">0</span>
+              </div>
+              <div class="pop-detail-row">
+                <span class="pop-detail-row-label">⛏ Minenarbeiter</span>
+                <span class="pop-detail-row-val" id="minerCount">0</span>
+              </div>
+              <div class="pop-detail-row">
+                <span class="pop-detail-row-label">🏗 Bauarbeiter</span>
+                <span class="pop-detail-row-val" id="builderCount">0</span>
+              </div>
+            </div>
+            <!-- Spalte 2: Mittelschicht -->
+            <div class="pop-detail-col">
+              <div class="pop-detail-col-title">Mittel</div>
+              <div class="pop-detail-row">
+                <span class="pop-detail-row-label">🛒 Händler</span>
+                <span class="pop-detail-row-val" id="haendlerCount">0</span>
+              </div>
+              <div class="pop-detail-row">
+                <span class="pop-detail-row-label">🔧 Handwerker</span>
+                <span class="pop-detail-row-val" id="handwerkerCount">0</span>
+              </div>
+            </div>
+            <!-- Spalte 3: Oberschicht -->
+            <div class="pop-detail-col">
+              <div class="pop-detail-col-title">Ober</div>
+              <div class="pop-detail-row">
+                <span class="pop-detail-row-label">👑 Adlige</span>
+                <span class="pop-detail-row-val" id="adligeCount">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Versteckte IDs für bestehende game.js-Logik -->
+          <span id="popValue" style="display:none;">0</span>
+          <div id="popBreakdown" style="display:none;"></div>
+          <div id="traderPlanControl" style="display:none;"></div>
+          <span id="growthLabel" style="display:none;">0%</span>
+          <span id="farmerLabel" style="display:none;">0</span>
+          <span id="traderLabel" style="display:none;">0</span>
+          <span id="soldierLabel" style="display:none;">0</span>
+          <div class="schicht-pop-badges" style="display:none;">
             <span class="spop-badge" id="schichtBadgeEinfache">👷 <span id="schichtEinfachePop">0</span></span>
             <span class="spop-badge" id="schichtBadgeMittel">🧑‍💼 <span id="schichtMittelPop">0</span></span>
             <span class="spop-badge" id="schichtBadgeOber">👑 <span id="schichtOberPop">0</span></span>
           </div>
-          <div id="bauarbeiterRow" style="display:none;font-size:11px;color:var(--warn);margin-top:3px;">🔨 Bauarbeiter: <span id="bauarbeiterCount">0</span></div>
-          <div id="popBreakdown" style="font-size:13px;color:var(--text-soft);margin-top:2px;display:none;"></div>
-          <div id="traderPlanControl" style="display:none;"></div>
-          <span id="growthLabel" style="display:none;">0%</span>
-          <span id="farmerLabel" style="display:none">0</span>
-          <span id="traderLabel" style="display:none">0</span>
-          <span id="soldierLabel" style="display:none">0</span>
+          <div id="bauarbeiterRow" style="display:none;"><span id="bauarbeiterCount">0</span></div>
         </div>
 
         <!-- Karte 3: Gebäude -->

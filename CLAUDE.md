@@ -138,6 +138,22 @@ Ziel: Produktionskette aus Rohstoffen → Zwischenprodukte → Handelswaren
 | 🌾 Lagerausbau | 200G · 40 Holz · 20 Stein | 70 |
 | 🏪 Marktplatz | 100G · 30 Holz · 30 Stein | 50 |
 
+### Einfache Leute – Arbeitszuweisung
+- Neue Bürger starten als Bauern mit 20% Produktivität und werden als "jobsuchend" markiert
+- Bauarbeiter werden zuerst abgezogen (fest bis Bau fertig, dann zurück zu jobsuchend)
+- Rest wird fließend (1/sek) nach Platz-Verhältnis verteilt:
+  - Bauern = Verfügbare × (Ackerplätze / Gesamtplätze)
+  - Miner = Verfügbare × (Mineplätze / Gesamtplätze)
+  - Säger = Verfügbare × (Sägewerkplätze / Gesamtplätze)
+- Überschuss (mehr Leute als Plätze) → jobsuchend, 20% Produktivität
+- Priorität: Spieler kann pro Gebäude +30% Arbeiteranteil aktivieren (im Gebäude-Popup)
+
+### Ackerfelder
+- 3 Felder, je 3 Stufen ausbaubar
+- Stufe 0: 20 Plätze · Stufe 1: 50 · Stufe 2: 100 · Stufe 3: 150
+- Gesamt max: 3 × 150 = 450 Bauern-Plätze
+- Baukosten je Stufe: 30G · 10s Bauzeit
+
 ### Nächste Implementierungsschritte
 1. `state.wood` und `state.tools` in game.js einführen (Lager, Produktion, Verbrauch)
 2. Sägewerk-Gebäude in `queueBuild`, `completeBuild` und Render-Logik einbauen
