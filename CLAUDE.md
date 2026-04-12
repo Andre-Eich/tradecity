@@ -146,11 +146,11 @@ Lagerausbau wurde gestrichen.
 | 3 | 250G · 80 Holz · 80 Stein | 250 | +Händler-Einkommen · +Max Mittelschicht |
 
 #### ⚔ Kaserne (3 Stufen)
-| Stufe | Kosten | Bauaufwand | Armee-Plätze |
+| Stufe | Kosten | Bauaufwand | Armee-Kapazität |
 |---|---|---|---|
-| 1 | 200G · 20 Holz · 80 Stein | 50 | +75 |
-| 2 | 250G · 40 Holz · 100 Stein | 150 | +150 |
-| 3 | 350G · 60 Holz · 120 Stein | 250 | +250 |
+| 1 | 200G · 20 Holz · 80 Stein | 50 | 50 Soldaten |
+| 2 | 250G · 40 Holz · 100 Stein | 150 | 100 Soldaten |
+| 3 | 350G · 60 Holz · 120 Stein | 250 | 200 Soldaten |
 
 #### 🌾 Ackerfelder
 3 Felder · je 3 Stufen · Stufe 0: 20 Plätze · Stufe 1: 50 · Stufe 2: 100 · Stufe 3: 150 · Baukosten je Stufe: 30G · Aufwand 50
@@ -241,3 +241,8 @@ Lagerausbau wurde gestrichen.
 - Sterne: nur ganze Sterne (★★★☆☆ Format, `starsHtml(val, max)`)
 - Alte Adligen-Bewerbungs-Popups (`zeigeAdligeAnfrage`, `_adligerTimer`, `adlige`) entfernt
 - Oberschicht Startwert: `state.schichten.ober.pop = 0` ✓
+- **Handelsgilde entfernt**: `guild`/`GUILD_COSTS`/`GUILD_TRADERS` aus allen Funktionen entfernt
+- **Marktplatz** (`state.buildings.marktplatz = 0`) als baubare 3-Stufen-Gebäude: Händler-EK 10%/40%/70%/100%, ermöglicht Händler-Routen
+- **Kaserne** BARRACKS_MAX auf `[50, 100, 200]` aktualisiert
+- **Armee-Schieberegler**: `state.armyTarget`, Tick ±1/min, ersetzt soldierPlan/recruitingPaused
+- `einkommenMittel()`: neue Formel mit `marktFaktor` + ±10% Schwankung

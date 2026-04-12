@@ -161,7 +161,6 @@
           <div style="display:none;">
             <div id="wellBldgCell"><span class="b-status" id="wellStatus">—</span><div id="wellBuildBar" style="width:0%"></div></div>
             <div id="churchBldgCell"><span class="b-status" id="churchStatus">—</span><div id="churchBuildBar" style="width:0%"></div></div>
-            <div id="guildBldgCell"><span class="b-status" id="guildStatus">—</span><div id="guildBuildBar" style="width:0%"></div></div>
             <div id="barracksBldgCell"><span class="b-status" id="barracksStatus">—</span><div id="barracksBuildBar" style="width:0%"></div></div>
           </div>
         </div>
@@ -255,21 +254,21 @@
           </div>
         </div>
 
-        <!-- Armee (preserved for JS) -->
-        <div class="scp1" id="armyCard">
+        <!-- Armee-Schieberegler -->
+        <div class="scp1" id="armyCard" style="display:none;">
           <div class="scp1-hdr">
             <span class="scp1-ico">⚔</span>
             <span class="scp1-name">Armee</span>
-            <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-              <span id="armyValue" style="font-size:20px;font-family:'Cinzel',serif;color:#adc0b4;">0/0</span>
-              <button id="recruitToggle" title="Rekrutierung" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0;line-height:1;">▶</button>
-            </div>
+            <span id="armyValue" style="margin-left:auto;font-size:14px;color:#adc0b4;">0/0</span>
           </div>
-          <div id="armyPlanControl" style="display:none;margin-top:4px;"></div>
-          <div id="mercBtn" style="display:none;margin-top:5px;">
-            <button id="hireMercBtn" style="background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.35);border-radius:6px;color:var(--gold-bright);font-size:13px;padding:3px 9px;cursor:pointer;white-space:nowrap;">
-              +10 Söldner · 35 Gold
-            </button>
+          <input type="range" id="armySlider" min="0" max="50" value="0"
+            style="width:100%;margin:6px 0 2px;accent-color:#adc0b4;">
+          <div style="font-size:11px;color:var(--text-soft);display:flex;gap:6px;">
+            <span>Ist: <strong id="armyIst">0</strong></span>
+            <span>·</span>
+            <span>Ziel: <strong id="armyZiel">0</strong></span>
+            <span>·</span>
+            <span>+1/min</span>
           </div>
         </div>
 
@@ -319,14 +318,14 @@
             <div class="b-status">0/3</div>
             <button class="b-action-btn" id="churchBtn">Bauen</button>
           </div>
-          <div class="build-row-item" id="guildRow">
+          <div class="build-row-item">
             <div class="b-icon">🏪</div>
             <div class="b-info">
-              <div class="b-name">Handelsgilde</div>
-              <div class="b-meta" id="guildMeta">100G · 15s · max. 2 Trupps à 25 Händler</div>
+              <div class="b-name">Marktplatz</div>
+              <div class="b-meta" id="marktplatzMeta">100G · Aufwand 50 · Händler-EK 40%</div>
             </div>
-            <div class="b-status">—</div>
-            <button class="b-action-btn" id="guildBtn">Bauen</button>
+            <div class="b-status" id="marktplatzStatus">—</div>
+            <button class="b-action-btn" id="marktplatzBtn">Bauen</button>
           </div>
           <div class="build-row-item" id="craftGuildRow">
             <div class="b-icon">🔧</div>
@@ -369,7 +368,6 @@
         <!-- Status wird jetzt direkt in den Buttons angezeigt -->
         <span id="wellCount" style="display:none">0</span>
         <span id="churchCount" style="display:none">0</span>
-        <span id="guildCount" style="display:none"></span>
         <span id="barracksCount" style="display:none"></span>
         <div class="queue-area" id="queueWrap"></div>
       </div><!-- mid-panel-inner -->
