@@ -278,3 +278,28 @@ Lagerausbau wurde gestrichen.
 - **Armee-Schieberegler**: `state.armyTarget`, Tick ±1/min, ersetzt soldierPlan/recruitingPaused
 - `einkommenMittel()`: neue Formel mit `marktFaktor` + ±10% Schwankung
 - **Nahrungslogik final**: neue `foodProduction/foodConsumption`, `versorgungTick` mit ±10/-20/min, Wachstum/Abwanderung via `versorgung`-Level
+
+## TODO - Naechste Session
+
+### Nahrungslogik komplett umbauen
+- Versorgung% abschaffen, neue Kennzahl: Nahrung pro Buerger (`state.food / gesamtBevoelkerung`)
+- Schwellenwerte: `> 5 N/Buerger = gut` / `2-5 = Warnung` / `< 2 = kritisch`
+- Wachstumseffekte: `> 5 -> Geburten +1%/min + Mittelschicht +1/min` / `< 5 -> Einfache -5%/min` / `< 2 -> Einfache -15%/min + Mittelschicht -10%/min`
+- Bilanz: Ueberschuss `+10/min` / Mangel `-20/min` (bleibt)
+- Anzeige Panel: `X / 1000 / X.X N/Buerger / X min Vorrat` + Richtungspfeil
+- Richtungspfeil 5 Zustaende: `Gruen hoch = starker Ueberschuss` / `Blau leicht hoch = leichter Ueberschuss` / `Gelb gerade = ausgeglichen` / `Orange leicht runter = leichter Mangel` / `Rot runter = kritischer Mangel`
+
+### Gebaeude-Popup verbessern
+- Breite auf `420px`
+- Titel ueber Bild
+- Effekte-Karte nach Bild
+- `Ausbau`-Label ueber Optionen
+
+### Ritter/Grosshaendler Annehmen-Button fixen
+- Buttons funktionieren nicht - DOM-Event Problem
+- Wenn Kapazitaet voll: Popup oeffnen, welche aktive Einheit ersetzt werden soll
+- Kapazitaet: Ruf `0-50 = 1 Platz` / `51-80 = 2 Plaetze` / `81-100 = 3 Plaetze`
+
+### Steuersatz-Bug fixen
+- Niedrig und Normal haben gleiches EK - Faktoren pruefen
+- Soll sein: Niedrig `50%` / Normal `100%` / Hoch `150%`
