@@ -154,6 +154,17 @@ Ziel: Produktionskette aus Rohstoffen → Zwischenprodukte → Handelswaren
 - Gesamt max: 3 × 150 = 450 Bauern-Plätze
 - Baukosten je Stufe: 30G · 10s Bauzeit
 
+### Mittelschicht – Wachstum & Jobs
+- Start: 10 Mittelschicht-Bürger, alle als Händler
+- Kein eigenes Gebäude für Mittelschicht
+- Wachstum:
+  - Nahrung > 50% → +1%/min Geburten
+  - Einkommen > 50% des Schicht-Durchschnitts → zufällig +1 Zuzug alle 2–3 min
+- Jobs: Händler und Handwerker, max 50/50 Aufteilung
+- Rohstoffe (Holz oder Stein & Erz) vorhanden → Händler werden zu Handwerkern (6/min)
+- Rohstoffe leer → Handwerker werden nach 1 min wieder zu Händlern
+- Handwerker geben Einfachen Leuten 1–5 Arbeitsplätze
+
 ### Nächste Implementierungsschritte
 1. `state.wood` und `state.tools` in game.js einführen (Lager, Produktion, Verbrauch)
 2. Sägewerk-Gebäude in `queueBuild`, `completeBuild` und Render-Logik einbauen
