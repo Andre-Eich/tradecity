@@ -40,12 +40,16 @@ Steuersätze (`TAX_RATES`):
 
 ### Arbeiter-System (Einfache Leute)
 Die Einfachen Leute verteilen sich auf Rollen in `state.workers`:
-- `farmers` — Bauern (produzieren Nahrung)
+- `farmers` — Bauern (produzieren Nahrung, nur auf Ackerplätzen 100% produktiv)
 - `miners` — Minenarbeiter (produzieren Rohstoffe)
 - `builders` — Bauarbeiter (auf Baustellen aktiv)
-- `idle` — ohne Job
+- `idle` — Jobsuchende (Startzustand für alle neuen Bürger)
 
-Verteilung läuft über `updateWorkerDistribution()` mit sanfter Lerp-Annäherung (8%/sek).
+**Alle neuen Bürger starten als `idle`.** Verteilung läuft über `updateWorkerDistribution()`:
+- Caps werden enforzt: Überschuss-Arbeiter → `idle`
+- 1/sek: 1 Jobsuchender sucht die Stelle mit den meisten freien Plätzen
+- Bei >10 freien Stellen in einem Beruf: 3–5 Jobsuchende/sek statt 1
+- `state._jobSeekTimer` akkumuliert Sekunden für den Jobsuche-Tick
 
 ### Bauarbeiter-Mechanik (implementiert)
 - **Bauleistung**: 1 Bauarbeiter = 1 Bauleistung/min
@@ -253,41 +257,32 @@ Lagerausbau wurde gestrichen.
 - Ersetzt die alte direkte `foodBalance() × seconds`-Aktualisierung im Haupt-Tick
 
 ### Wachstum Einfache Leute
-- Geburten: `+1%/min` wenn `versorgung ≥ 50`
-- Zuzug: `(1 + ekFaktor × 5)/min` wenn offene Jobs vorhanden (`ekFaktor = (income - 100) / 100`)
-- Abwanderung: `−5%/min` bei `versorgung < 50`, `−10%/min` bei `versorgung < 20`
+Kennzahl: `fpc = state.food / totalCitizens()` (Nahrung pro Bürger, alle 3 Schichten)
+- Geburten: `(random(1–5) + fpc) / min` wenn `fpc > 3` — absoluter Wert, kein Prozentsatz
+- Steuermodifikator auf Geburten: Niedrig `×2.0` / Normal `×1.0` / Hoch `×0.5`
+- Abwanderung: `−5%/min` bei `fpc < 3`, `−15%/min` bei `fpc < 1.5`
 
 ### Wachstum Mittelschicht
-- Zuzug: `+1/min` wenn `versorgung ≥ 50`
-- Abwanderung EK: `−1/min` wenn `income ≤ 230` und `versorgung < 50`
-- Abwanderung Mangel: `−10%/min` wenn `versorgung < 20`
+- Zuzug: `+1/min` wenn `fpc > 3`
+- Abwanderung: `−10%/min` wenn `fpc < 1.5`
 
 ### Wachstum Oberschicht
 - `state.schichten.ober.pop = state.nobles.length` (direkt aus Bewerbersystem)
 
-## Aktuelle Session
+## Aktuelle Session (April 2026, Commit d62854c)
 - Oberschicht-Popup Layout fertig (rechte Box 200px, Bewerber + Aktiv)
 - Bewerbersystem implementiert: `state.applicants`, `state.nobles`, `generateApplicant()`, `renderApplicants()`
 - Erfahrungswachstum: +1 XP/min für aktive Einheiten (`noble.erfahrung`)
 - Sterne: nur ganze Sterne (★★★☆☆ Format, `starsHtml(val, max)`)
-- Alte Adligen-Bewerbungs-Popups (`zeigeAdligeAnfrage`, `_adligerTimer`, `adlige`) entfernt
-- Oberschicht Startwert: `state.schichten.ober.pop = 0` ✓
-- **Handelsgilde entfernt**: `guild`/`GUILD_COSTS`/`GUILD_TRADERS` aus allen Funktionen entfernt
-- **Marktplatz** (`state.buildings.marktplatz = 0`) als baubare 3-Stufen-Gebäude: Händler-EK 10%/40%/70%/100%, ermöglicht Händler-Routen
-- **Kaserne** BARRACKS_MAX auf `[50, 100, 200]` aktualisiert
-- **Armee-Schieberegler**: `state.armyTarget`, Tick ±1/min, ersetzt soldierPlan/recruitingPaused
-- `einkommenMittel()`: neue Formel mit `marktFaktor` + ±10% Schwankung
-- **Nahrungslogik final**: neue `foodProduction/foodConsumption`, `versorgungTick` mit ±10/-20/min, Wachstum/Abwanderung via `versorgung`-Level
+- **Handelsgilde entfernt**, **Marktplatz** 3-Stufen, **Kaserne** BARRACKS_MAX `[50,100,200]`
+- **Armee-Schieberegler**: `state.armyTarget`, Tick ±1/min
+- **Nahrungslogik**: `foodProduction/foodConsumption`, `versorgungTick` ±10/-20/min
+- **Wachstum auf fpc umgestellt**: Schwellenwerte 1.5 / 3 (Nahrung/Alle Einwohner)
+- **Arbeiterverteilung neu**: alle starten als `idle`, 1/sek Jobsuche (>10 Stellen: 3–5/sek)
+- **Ackerfelder**: 6 Felder im Popup, `farms: [0,0,0,-1,-1,-1]`, gesperrte für 80G freischaltbar
+- **Steuermodifikator Wachstum**: Niedrig ×2 / Normal ×1 / Hoch ×0.5 auf Geburten
 
 ## TODO - Naechste Session
-
-### Nahrungslogik komplett umbauen
-- Versorgung% abschaffen, neue Kennzahl: Nahrung pro Buerger (`state.food / gesamtBevoelkerung`)
-- Schwellenwerte: `> 5 N/Buerger = gut` / `2-5 = Warnung` / `< 2 = kritisch`
-- Wachstumseffekte: `> 5 -> Geburten +1%/min + Mittelschicht +1/min` / `< 5 -> Einfache -5%/min` / `< 2 -> Einfache -15%/min + Mittelschicht -10%/min`
-- Bilanz: Ueberschuss `+10/min` / Mangel `-20/min` (bleibt)
-- Anzeige Panel: `X / 1000 / X.X N/Buerger / X min Vorrat` + Richtungspfeil
-- Richtungspfeil 5 Zustaende: `Gruen hoch = starker Ueberschuss` / `Blau leicht hoch = leichter Ueberschuss` / `Gelb gerade = ausgeglichen` / `Orange leicht runter = leichter Mangel` / `Rot runter = kritischer Mangel`
 
 ### Gebaeude-Popup verbessern
 - Breite auf `420px`
