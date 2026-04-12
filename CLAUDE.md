@@ -234,6 +234,37 @@ Lagerausbau wurde gestrichen.
 - **Version:** `0.1-dev`
 - **Bemerkung:** Das Projekt ist aktiv in Arbeit und wird momentan über `index.html`, `game.js` und `style.css` gepflegt.
 
+## Nahrungslogik (final)
+
+### Produktion
+`foodProduction()` → pro Sekunde (×60 = pro Minute):
+- Bauern mit Acker: `bauernMitAcker × 2 / 60`
+- Bauern ohne Acker: `bauernOhneAcker × 0.4 / 60`
+
+### Konsum
+`foodConsumption()` → pro Sekunde:
+- `(einfache.pop + mittel.pop + ober.pop + Math.floor(army)) / 60`
+- 1 Nahrung pro Person/Minute
+
+### Versorgungsbilanz (`versorgungTick`)
+- Überschuss (Produktion > Konsum): `food += 10/min`
+- Mangel: `food -= 20/min`
+- `state.versorgung = (food / foodMax) × 100`
+- Ersetzt die alte direkte `foodBalance() × seconds`-Aktualisierung im Haupt-Tick
+
+### Wachstum Einfache Leute
+- Geburten: `+1%/min` wenn `versorgung ≥ 50`
+- Zuzug: `(1 + ekFaktor × 5)/min` wenn offene Jobs vorhanden (`ekFaktor = (income - 100) / 100`)
+- Abwanderung: `−5%/min` bei `versorgung < 50`, `−10%/min` bei `versorgung < 20`
+
+### Wachstum Mittelschicht
+- Zuzug: `+1/min` wenn `versorgung ≥ 50`
+- Abwanderung EK: `−1/min` wenn `income ≤ 230` und `versorgung < 50`
+- Abwanderung Mangel: `−10%/min` wenn `versorgung < 20`
+
+### Wachstum Oberschicht
+- `state.schichten.ober.pop = state.nobles.length` (direkt aus Bewerbersystem)
+
 ## Aktuelle Session
 - Oberschicht-Popup Layout fertig (rechte Box 200px, Bewerber + Aktiv)
 - Bewerbersystem implementiert: `state.applicants`, `state.nobles`, `generateApplicant()`, `renderApplicants()`
@@ -246,3 +277,4 @@ Lagerausbau wurde gestrichen.
 - **Kaserne** BARRACKS_MAX auf `[50, 100, 200]` aktualisiert
 - **Armee-Schieberegler**: `state.armyTarget`, Tick ±1/min, ersetzt soldierPlan/recruitingPaused
 - `einkommenMittel()`: neue Formel mit `marktFaktor` + ±10% Schwankung
+- **Nahrungslogik final**: neue `foodProduction/foodConsumption`, `versorgungTick` mit ±10/-20/min, Wachstum/Abwanderung via `versorgung`-Level
