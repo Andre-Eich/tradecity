@@ -223,3 +223,11 @@ Ziel: Produktionskette aus Rohstoffen → Zwischenprodukte → Handelswaren
 - **Status:** Entwicklungsversion / kein formaler Release-Tag
 - **Version:** `0.1-dev`
 - **Bemerkung:** Das Projekt ist aktiv in Arbeit und wird momentan über `index.html`, `game.js` und `style.css` gepflegt.
+
+## Aktuelle Session
+- Oberschicht-Popup Layout fertig (rechte Box 200px, Bewerber + Aktiv)
+- Bewerbersystem implementiert: `state.applicants`, `state.nobles`, `generateApplicant()`, `renderApplicants()`
+- Erfahrungswachstum: +1 XP/min für aktive Einheiten (`noble.erfahrung`)
+- Sterne: nur ganze Sterne (★★★☆☆ Format, `starsHtml(val, max)`)
+- Alte Adligen-Bewerbungs-Popups (`zeigeAdligeAnfrage`, `_adligerTimer`, `adlige`) entfernt
+- Oberschicht Startwert: `state.schichten.ober.pop = 0` ✓
