@@ -173,6 +173,52 @@ Ziel: Produktionskette aus Rohstoffen → Zwischenprodukte → Handelswaren
 5. Handwerker-Produktion an Holz+Werkzeuge-Verfügbarkeit koppeln
 6. UI-Ressourcenkarten für Holz und Werkzeuge aktivieren (Platzhalter bereits in index.html)
 
+## Oberschicht-System
+
+### Regionaler Ruf
+- Neue Ressource, Startwert: 50/100
+- Wird oben im Panel neben "Mein Reich" angezeigt
+- Je höher der Ruf desto bessere Einheiten bewerben sich
+- Beeinflusst Qualität (Sterne) der Bewerber
+
+### Oberschicht
+- Startet mit 0 Einheiten
+- Zwei Einheitentypen: Großhändler und Ritter
+- Qualität wird in Sternen angezeigt: 0.5 bis 5.0 (in 0.5 Schritten)
+- Formel: `Sterne = Math.round((wert / 100) × 10) / 2`
+
+### Großhändler
+- Handelserfahrung: 0–100 (wird bei aktiven Handelsrouten gebunden)
+  - Dorf: 0–25 XP gebunden (zufällig generiert)
+  - Stadt: 25–50 XP gebunden (zufällig generiert)
+  - Große Stadt: 50–100 XP gebunden (zufällig generiert)
+  - Nicht genug XP → Handelsroute kann nicht gestartet werden
+- Handelstrupps: 1–5
+- Einkommen: 1000–5000 G/min (in Sternen angezeigt)
+
+### Ritter
+- Militärerfahrung: 0–100 (wird bei Angriffen gebunden)
+  - Benötigte XP abhängig von Angriffsgröße und Zielgröße
+  - Nicht genug XP → Angriff kann nicht gestartet werden
+  - Mehrere Ritter können XP kombinieren
+- Soldaten: 100–1000 (eigene Ritter-Armee, getrennt von Basis-Armee)
+- Einkommen: 1000–5000 G/min (in Sternen angezeigt)
+- Bei Angriff: Ritter-Armee + Basis-Armee kämpfen gemeinsam
+
+### Bewerbersystem (Stadt-Popup)
+- Rechte Box 200px breit im Stadt-Popup
+- Stadtkarte wird an den linken Rand geschoben
+- Obere Hälfte: Bewerberkarten
+  - Neue Bewerberkarte alle 30–60 Sek (zufällig)
+  - Max 4 Bewerberkarten gleichzeitig
+  - Timer pausiert wenn 4 Karten vorhanden
+  - Jede Karte bleibt 60–120 Sek, dann verschwindet sie
+  - Spieler kann Annehmen oder Ablehnen
+  - Bewerberkarte zeigt: Typ, alle 3 Werte in Sternen, Countdown
+- Untere Hälfte: Aktive Oberschicht-Einheiten als Karten
+  - Großhändler-Karten mit allen Werten in Sternen
+  - Ritter-Karten mit allen Werten in Sternen
+
 ## Aktuelle Version
 - **Status:** Entwicklungsversion / kein formaler Release-Tag
 - **Version:** `0.1-dev`

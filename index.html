@@ -55,7 +55,7 @@
               <span id="gpsValue" style="font-size:13px;color:var(--good);">0/min</span>
             </div>
           </div>
-          <div id="goldBreakdown" style="font-size:13px;color:var(--text-soft);"></div>
+          <div id="goldBreakdown" style="display:none;"></div>
           <div class="tax-control">
             <span class="t-name" style="font-size:11px;margin-bottom:3px;display:block;">⚖ Steuersatz</span>
             <div id="taxSteps" class="tax-schicht-badges">
@@ -74,20 +74,20 @@
             <span class="scp1-name">Einwohner</span>
           </div>
 
-          <!-- Obere Badge-Reihe: je 1/3 pro Schicht -->
-          <div class="pop-schicht-badges">
-            <div class="pop-schicht-badge">
-              <div class="pop-schicht-badge-title">👥 Einfache</div>
-              <div class="pop-schicht-badge-count" id="einfacheCount">0</div>
-              <div class="pop-schicht-badge-sub" id="idleCount">0 suchen Job</div>
+          <!-- Obere Badge-Reihe: kompakt, Icon + Zahl -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:6px;">
+            <div class="mini-box" style="text-align:center;">
+              <div class="mini-label">👷 Einfache</div>
+              <div class="mini-val" id="einfacheCount">0</div>
+              <div style="font-size:10px;color:#e07060;" id="idleCount"></div>
             </div>
-            <div class="pop-schicht-badge">
-              <div class="pop-schicht-badge-title">👥 Mittel</div>
-              <div class="pop-schicht-badge-count" id="mittelCount">0</div>
+            <div class="mini-box" style="text-align:center;">
+              <div class="mini-label">🧑‍💼 Mittel</div>
+              <div class="mini-val" id="mittelCount">0</div>
             </div>
-            <div class="pop-schicht-badge">
-              <div class="pop-schicht-badge-title">👑 Ober</div>
-              <div class="pop-schicht-badge-count" id="oberCount">0</div>
+            <div class="mini-box" style="text-align:center;">
+              <div class="mini-label">👑 Ober</div>
+              <div class="mini-val" id="oberCount">0</div>
             </div>
           </div>
 
@@ -133,7 +133,6 @@
 
           <!-- Versteckte IDs für bestehende game.js-Logik -->
           <span id="popValue" style="display:none;">0</span>
-          <div id="popBreakdown" style="display:none;"></div>
           <div id="traderPlanControl" style="display:none;"></div>
           <span id="growthLabel" style="display:none;">0%</span>
           <span id="farmerLabel" style="display:none;">0</span>
@@ -149,35 +148,20 @@
 
         <!-- Karte 3: Gebäude -->
         <div class="scp1">
-          <div class="scp1-hdr">
-            <span class="scp1-ico">🏛</span>
+          <div class="scp1-hdr" style="flex-wrap:nowrap;gap:8px;">
+            <span class="scp1-ico">🏗</span>
             <span class="scp1-name">Gebäude</span>
+            <span id="activeBuildName" style="font-size:12px;color:var(--text);white-space:nowrap;">Nichts in Bau</span>
+            <div id="activeBuildBar" style="flex:1;max-width:50%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;display:none;">
+              <div id="activeBuildFill" style="height:100%;border-radius:2px;width:0%;background:var(--warn);transition:width 0.4s;"></div>
+            </div>
           </div>
-          <div class="bldg-icons-p1">
-            <div class="bldg-ic-cell" id="wellBldgCell">
-              <span class="bldg-ic-emoji">🪣</span>
-              <span class="bldg-ic-lbl">Mine</span>
-              <span class="b-status" id="wellStatus">—</span>
-              <div class="bldg-ic-bar" style="display:none"><div class="bldg-ic-bar-fill" id="wellBuildBar" style="width:0%"></div></div>
-            </div>
-            <div class="bldg-ic-cell" id="churchBldgCell">
-              <span class="bldg-ic-emoji">⛪</span>
-              <span class="bldg-ic-lbl">Kirche</span>
-              <span class="b-status" id="churchStatus">—</span>
-              <div class="bldg-ic-bar" style="display:none"><div class="bldg-ic-bar-fill" id="churchBuildBar" style="width:0%"></div></div>
-            </div>
-            <div class="bldg-ic-cell" id="guildBldgCell">
-              <span class="bldg-ic-emoji">🏪</span>
-              <span class="bldg-ic-lbl">Gilde</span>
-              <span class="b-status" id="guildStatus">—</span>
-              <div class="bldg-ic-bar" style="display:none"><div class="bldg-ic-bar-fill" id="guildBuildBar" style="width:0%"></div></div>
-            </div>
-            <div class="bldg-ic-cell" id="barracksBldgCell">
-              <span class="bldg-ic-emoji">⚔</span>
-              <span class="bldg-ic-lbl">Kaserne</span>
-              <span class="b-status" id="barracksStatus">—</span>
-              <div class="bldg-ic-bar" style="display:none"><div class="bldg-ic-bar-fill" id="barracksBuildBar" style="width:0%"></div></div>
-            </div>
+          <!-- Versteckte IDs für game.js -->
+          <div style="display:none;">
+            <div id="wellBldgCell"><span class="b-status" id="wellStatus">—</span><div id="wellBuildBar" style="width:0%"></div></div>
+            <div id="churchBldgCell"><span class="b-status" id="churchStatus">—</span><div id="churchBuildBar" style="width:0%"></div></div>
+            <div id="guildBldgCell"><span class="b-status" id="guildStatus">—</span><div id="guildBuildBar" style="width:0%"></div></div>
+            <div id="barracksBldgCell"><span class="b-status" id="barracksStatus">—</span><div id="barracksBuildBar" style="width:0%"></div></div>
           </div>
         </div>
 
