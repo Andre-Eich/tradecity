@@ -105,38 +105,55 @@ Ziel: Produktionskette aus Rohstoffen → Zwischenprodukte → Handelswaren
 **Bauleistung/min** = Anzahl zugewiesener Bauarbeiter (1 Arbeiter = 1 Bauleistung/min)  
 **Draw-Rate**: 1 Arbeiter/Sekunde aus Einfachen Leuten → Baustelle (bereits implementiert)
 
-### Gebäude-Stufen mit Bauaufwand und Kosten
+### Gebäude-System (finale Version)
 
-#### 🪚 Sägewerk (neu – noch nicht implementiert)
+Einheitlicher Bauaufwand: Stufe 1 = 50, Stufe 2 = 150, Stufe 3 = 250. Einzelgebäude = 50.  
+Lagerausbau wurde gestrichen.
+
+#### 🪚 Sägewerk (neu)
 | Stufe | Kosten | Bauaufwand | Produktion | Arbeiter |
 |---|---|---|---|---|
-| 1 | 50G · 20 Stein | 30 | +5 Holz/min | 5 |
-| 2 | 100G · 30 Stein | 60 | +12 Holz/min | 10 |
-| 3 | 200G · 50 Stein | 120 | +25 Holz/min | 20 |
+| 1 | 50G · 20 Stein | 50 | +5 Holz/min | 5 |
+| 2 | 100G · 30 Stein | 150 | +12 Holz/min | 10 |
+| 3 | 200G · 50 Stein | 250 | +25 Holz/min | 20 |
 
-#### ⛏ Mine (Umbau – derzeit nur Rohstoffe, künftig Stein & Erz)
+#### ⛏ Mine (Stein & Erz)
 | Stufe | Kosten | Bauaufwand | Produktion | Arbeiter |
 |---|---|---|---|---|
-| 1 | 100G | 40 | +5 Stein/min | 5 |
-| 2 | 150G · 20 Holz | 80 | +12 Stein/min | 10 |
-| 3 | 250G · 40 Holz | 160 | +25 Stein/min | 20 |
+| 1 | 100G | 50 | +5 Stein & Erz/min | 5 |
+| 2 | 150G · 20 Holz | 150 | +12 Stein & Erz/min | 10 |
+| 3 | 250G · 40 Holz | 250 | +25 Stein & Erz/min | 20 |
 
-> Stufe 1 benötigt nur Gold (Early-Game ohne Holz/Stein-Voraussetzung)
-
-#### 🔨 Schmiede (neu – noch nicht implementiert)
+#### 🔨 Schmiede (neu)
 | Stufe | Kosten | Bauaufwand | Produktion | Arbeiter |
 |---|---|---|---|---|
 | 1 | 100G · 20 Holz · 30 Stein | 50 | +3 Werkzeuge/min | 3 |
-| 2 | 200G · 40 Holz · 60 Stein | 100 | +8 Werkzeuge/min | 6 |
-| 3 | 350G · 80 Holz · 100 Stein | 200 | +15 Werkzeuge/min | 10 |
+| 2 | 200G · 40 Holz · 60 Stein | 150 | +8 Werkzeuge/min | 6 |
+| 3 | 350G · 80 Holz · 100 Stein | 250 | +15 Werkzeuge/min | 10 |
 
-#### Bestehende Gebäude (Kosten-Referenz für neue Ressourcen-Anforderungen)
-| Gebäude | Kosten | Bauaufwand |
-|---|---|---|
-| ⛪ Kirche | 150G · 30 Holz · 50 Stein | 60 |
-| ⚔ Kaserne | 200G · 20 Holz · 80 Stein | 80 |
-| 🌾 Lagerausbau | 200G · 40 Holz · 20 Stein | 70 |
-| 🏪 Marktplatz | 100G · 30 Holz · 30 Stein | 50 |
+#### ⛪ Kirche (3 Stufen)
+| Stufe | Kosten | Bauaufwand | Effekte |
+|---|---|---|---|
+| 1 | 150G · 30 Holz · 50 Stein | 50 | +Ruf · +Wachstum Einfache Leute |
+| 2 | 200G · 50 Holz · 80 Stein | 150 | +Ruf · +Wachstum Einfache Leute |
+| 3 | 300G · 80 Holz · 120 Stein | 250 | +Ruf · +Wachstum Einfache Leute |
+
+#### 🏪 Marktplatz (3 Stufen)
+| Stufe | Kosten | Bauaufwand | Effekte |
+|---|---|---|---|
+| 1 | 100G · 30 Holz · 30 Stein | 50 | +Händler-Einkommen · +Max Mittelschicht |
+| 2 | 150G · 50 Holz · 50 Stein | 150 | +Händler-Einkommen · +Max Mittelschicht |
+| 3 | 250G · 80 Holz · 80 Stein | 250 | +Händler-Einkommen · +Max Mittelschicht |
+
+#### ⚔ Kaserne (3 Stufen)
+| Stufe | Kosten | Bauaufwand | Armee-Plätze |
+|---|---|---|---|
+| 1 | 200G · 20 Holz · 80 Stein | 50 | +75 |
+| 2 | 250G · 40 Holz · 100 Stein | 150 | +150 |
+| 3 | 350G · 60 Holz · 120 Stein | 250 | +250 |
+
+#### 🌾 Ackerfelder
+3 Felder · je 3 Stufen · Stufe 0: 20 Plätze · Stufe 1: 50 · Stufe 2: 100 · Stufe 3: 150 · Baukosten je Stufe: 30G · Aufwand 50
 
 ### Einfache Leute – Arbeitszuweisung
 - Neue Bürger starten als Bauern mit 20% Produktivität und werden als "jobsuchend" markiert
@@ -147,12 +164,6 @@ Ziel: Produktionskette aus Rohstoffen → Zwischenprodukte → Handelswaren
   - Säger = Verfügbare × (Sägewerkplätze / Gesamtplätze)
 - Überschuss (mehr Leute als Plätze) → jobsuchend, 20% Produktivität
 - Priorität: Spieler kann pro Gebäude +30% Arbeiteranteil aktivieren (im Gebäude-Popup)
-
-### Ackerfelder
-- 3 Felder, je 3 Stufen ausbaubar
-- Stufe 0: 20 Plätze · Stufe 1: 50 · Stufe 2: 100 · Stufe 3: 150
-- Gesamt max: 3 × 150 = 450 Bauern-Plätze
-- Baukosten je Stufe: 30G · 10s Bauzeit
 
 ### Mittelschicht – Wachstum & Jobs
 - Start: 10 Mittelschicht-Bürger, alle als Händler
@@ -166,12 +177,11 @@ Ziel: Produktionskette aus Rohstoffen → Zwischenprodukte → Handelswaren
 - Handwerker geben Einfachen Leuten 1–5 Arbeitsplätze
 
 ### Nächste Implementierungsschritte
-1. `state.wood` und `state.tools` in game.js einführen (Lager, Produktion, Verbrauch)
-2. Sägewerk-Gebäude in `queueBuild`, `completeBuild` und Render-Logik einbauen
-3. Schmiede-Gebäude einbauen (Input: Stein+Erz → Output: Werkzeuge)
-4. Mine auf Stein+Erz-Output umstellen
-5. Handwerker-Produktion an Holz+Werkzeuge-Verfügbarkeit koppeln
-6. UI-Ressourcenkarten für Holz und Werkzeuge aktivieren (Platzhalter bereits in index.html)
+1. Mine auf Stein+Erz-Output umstellen (derzeit noch Rohstoffe-Generik)
+2. Sägewerk-Holzproduktion an Spieltick koppeln (Rate: 5/12/25 Holz/min je Stufe)
+3. Schmiede-Produktion anschalten (Input: Stein+Erz → Output: Werkzeuge)
+4. Handwerker-Produktion an Holz+Werkzeuge-Verfügbarkeit koppeln
+5. UI-Ressourcenkarten für Holz und Werkzeuge aktivieren (Platzhalter bereits in index.html)
 
 ## Oberschicht-System
 
