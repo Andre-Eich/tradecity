@@ -297,6 +297,19 @@ Kennzahl: `fpc = state.food / totalCitizens()` (Nahrung pro Bürger, alle 3 Schi
 - Produktionsrate im Panel: +X.X/min (nur wenn Holz UND Stein/Erz vorhanden)
 - `prodHandelswarenProMin()` und `prodSteinErzProMin()` als Hilfsfunktionen
 
+## Tagesabschluss 2026-04-13
+
+### Heute erledigt
+- Startabbruch behoben: in `rohstoffTick()` wurde ein undefiniertes `min` verwendet
+- Handwerker-Lagergrenze in `rohstoffTick()` auf explizite `50` gesetzt
+- Minenproduktion auf `1.5 Stein/Erz` pro Minenarbeiter und Minute angepasst
+- Panel-Label von `Rohstoffe` auf `Stein/Erz` umbenannt
+- Handwerker-Freigabe auf Rohstoffsumme `Holz + Stein/Erz` umgestellt
+
+### Offener Punkt
+- Trotz ausreichender Rohstoffsumme (`Holz + Stein/Erz > 10`) entstehen im Spiel teils weiterhin keine Handwerkerjobs
+- Naechster Einstieg: `wachstumMittelTick()`, `tickSchichten()` und Anzeige in `renderInfo()` zusammen pruefen
+
 ## TODO - Naechste Session
 
 ### Gebaeude-Popup verbessern
