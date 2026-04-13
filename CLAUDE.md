@@ -269,18 +269,33 @@ Kennzahl: `fpc = state.food / totalCitizens()` (Nahrung pro Bürger, alle 3 Schi
 ### Wachstum Oberschicht
 - `state.schichten.ober.pop = state.nobles.length` (direkt aus Bewerbersystem)
 
-## Aktuelle Session (April 2026, Commit d62854c)
-- Oberschicht-Popup Layout fertig (rechte Box 200px, Bewerber + Aktiv)
-- Bewerbersystem implementiert: `state.applicants`, `state.nobles`, `generateApplicant()`, `renderApplicants()`
-- Erfahrungswachstum: +1 XP/min für aktive Einheiten (`noble.erfahrung`)
-- Sterne: nur ganze Sterne (★★★☆☆ Format, `starsHtml(val, max)`)
-- **Handelsgilde entfernt**, **Marktplatz** 3-Stufen, **Kaserne** BARRACKS_MAX `[50,100,200]`
-- **Armee-Schieberegler**: `state.armyTarget`, Tick ±1/min
-- **Nahrungslogik**: `foodProduction/foodConsumption`, `versorgungTick` ±10/-20/min
-- **Wachstum auf fpc umgestellt**: Schwellenwerte 1.5 / 3 (Nahrung/Alle Einwohner)
-- **Arbeiterverteilung neu**: alle starten als `idle`, 1/sek Jobsuche (>10 Stellen: 3–5/sek)
-- **Ackerfelder**: 6 Felder im Popup, `farms: [0,0,0,-1,-1,-1]`, gesperrte für 80G freischaltbar
-- **Steuermodifikator Wachstum**: Niedrig ×2 / Normal ×1 / Hoch ×0.5 auf Geburten
+## Aktuelle Session (April 2026, diese Session)
+
+### Mittelschicht – idle-basiertes Jobsystem
+- Alle Mittelschicht-Bürger starten als `idle` (neu: `state.schichten.mittel.idle`)
+- Alle 10 Sek findet 1 Jobsuchender einen Job: Handwerker wenn Slots frei, sonst Händler
+- Händler = pop − handwerker − idle (abgeleitet, nie gespeichert)
+- Handwerker-Schonzeit: 60 Sek bevor Rohstoffmangel zur Entlassung führt (`_handwerkerGraceTimer`)
+- Handwerker-Slots = floor(pop/2), nur wenn Holz > 0 UND Stein/Erz > 0
+
+### Sägewerk (implementiert)
+- `SAWMILL_WORKERS = [10, 20, 40]` Holzarbeiter je Stufe
+- Holzarbeiter produzieren 2 Holz/min je Arbeiter
+- Holzlager: 100 / 200 / 400 je Stufe
+- Holz-Anzeige im Panel aktiv (woodCurrent, woodMax, woodFill, woodRate)
+
+### Mine (implementiert)
+- `MINE_WORKERS = [10, 20, 40]` Minenarbeiter je Stufe (war 5/10/20)
+- `MINE_STORAGE = [100, 200, 400]` Lager-Max Stein/Erz je Stufe
+- Produktion: 2 Stein/Erz je Minenarbeiter pro Ø 7.5 Sek
+- Stein/Erz ist eine einzelne Ressource (`rohstoffLager.stein`)
+- Rohstoff-Karte im Panel zeigt Stein/Erz + Rate
+
+### Handwerker-Produktion (implementiert)
+- Verbrauch: 3 Holz + 1 Stein/Erz → 1 Handelware pro Ø 7.5 Sek
+- Engpass: bei Rohstoffmangel skaliert Produktion proportional
+- Produktionsrate im Panel: +X.X/min (nur wenn Holz UND Stein/Erz vorhanden)
+- `prodHandelswarenProMin()` und `prodSteinErzProMin()` als Hilfsfunktionen
 
 ## TODO - Naechste Session
 
