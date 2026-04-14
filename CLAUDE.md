@@ -238,36 +238,76 @@ Lagerausbau wurde gestrichen.
 - **Version:** `0.1-dev`
 - **Bemerkung:** Das Projekt ist aktiv in Arbeit und wird momentan über `index.html`, `game.js` und `style.css` gepflegt.
 
-## Nahrungslogik (final)
+## Nahrungslogik (Stand 2026-04-14)
+
+### Startwerte
+- Start-Nahrung: `300`
+- Kennzahl für Versorgung und Wachstum: `foodPerCitizen() = state.food / totalCitizens()`
+
+### Verbrauch
+`foodConsumption()` → pro Sekunde (×60 = pro Minute):
+- Einfache Leute: `1 Nahrung/min`
+- Mittelschicht: `5 Nahrung/min`
+- Oberschicht: `10 Nahrung/min`
+- Armee: `1 Nahrung/min`
 
 ### Produktion
 `foodProduction()` → pro Sekunde (×60 = pro Minute):
-- Bauern mit Acker: `bauernMitAcker × 2 / 60`
-- Bauern ohne Acker: `bauernOhneAcker × 0.4 / 60`
+- Bauern ohne Acker: `1.5 Nahrung/min`
+- Ackerfeld Stufe 0: `1.5 Nahrung/min` je Bauer
+- Ackerfeld Stufe 1: `2.5 Nahrung/min` je Bauer
+- Ackerfeld Stufe 2: `3.0 Nahrung/min` je Bauer
+- Ackerfeld Stufe 3: `3.5 Nahrung/min` je Bauer
+- Nur `workers.farmers` produzieren Nahrung; `jobsuchend` produziert nicht
 
-### Konsum
-`foodConsumption()` → pro Sekunde:
-- `(einfache.pop + mittel.pop + ober.pop + Math.floor(army)) / 60`
-- 1 Nahrung pro Person/Minute
+### Versorgungsbilanz
+- `foodStorageDeltaPerMin()` nutzt jetzt die echte Netto-Bilanz `foodBalance() * 60`
+- Nahrung wird nicht mehr in groben Stufen `+10/-20` bewegt, sondern mit der realen Produktions-/Verbrauchsdifferenz
 
-### Versorgungsbilanz (`versorgungTick`)
-- Überschuss (Produktion > Konsum): `food += 10/min`
-- Mangel: `food -= 20/min`
-- `state.versorgung = (food / foodMax) × 100`
-- Ersetzt die alte direkte `foodBalance() × seconds`-Aktualisierung im Haupt-Tick
+### Wachstumsschwellen
+Kennzahl: `fpc = state.food / totalCitizens()` (Nahrung pro Bürger, alle 3 Schichten)
+- Positiver Bereich: `fpc > 2.0`
+- Negativer Bereich: `fpc < 2.0`
+- Starker negativer Bereich: `fpc < 0.75`
 
 ### Wachstum Einfache Leute
-Kennzahl: `fpc = state.food / totalCitizens()` (Nahrung pro Bürger, alle 3 Schichten)
-- Geburten: `(random(1–5) + fpc) / min` wenn `fpc > 3` — absoluter Wert, kein Prozentsatz
+- Geburten: `(random(1–5) + fpc) / min` wenn `fpc > 2`
 - Steuermodifikator auf Geburten: Niedrig `×2.0` / Normal `×1.0` / Hoch `×0.5`
-- Abwanderung: `−5%/min` bei `fpc < 3`, `−15%/min` bei `fpc < 1.5`
+- Abwanderung: `−5%/min` bei `0.75 ≤ fpc < 2`
+- Abwanderung: `−15%/min` bei `fpc < 0.75`
 
 ### Wachstum Mittelschicht
-- Zuzug: `+1/min` wenn `fpc > 3`
-- Abwanderung: `−10%/min` wenn `fpc < 1.5`
+- Zuzug: `+1/min` wenn `fpc > 2`
+- Abwanderung: `−10%/min` wenn `fpc < 0.75`
 
 ### Wachstum Oberschicht
 - `state.schichten.ober.pop = state.nobles.length` (direkt aus Bewerbersystem)
+
+## Ackerlogik (Stand 2026-04-14)
+
+### Jobs pro Feld
+- Startzustand: `15 Bauern-Jobs`
+- Ausbau Stufe 1: insgesamt `25 Jobs` (`+10`)
+- Ausbau Stufe 2: insgesamt `45 Jobs` (`+20`)
+- Ausbau Stufe 3: insgesamt `75 Jobs` (`+30`)
+
+### Wichtige Regel
+- Acker-Ausbau gibt zusätzliche Jobs
+- Die Arbeiterverteilung bleibt slot-basiert: nur verfügbare Jobs werden besetzt, der Rest bleibt `jobsuchend`
+
+## Schmiede-Logik (Stand 2026-04-14)
+
+### Schmiede Stufe 1
+- `10 Schmied-Jobs`
+- `50 Lagerplätze` für Werkzeuge
+- `10 Werkzeuge/min` bei voller Versorgung
+
+### Produktion & Fallback
+- Schmiede nutzt eigene Arbeiterrolle `workers.smiths`
+- Volle Produktion nur wenn Holz und Stein/Erz vorhanden sind
+- Pro aktivem Schmied werden `1 Holz/min` und `1 Stein/Erz/min` verbraucht
+- Ohne diese Rohstoffe produziert die ganze Schmiede nur `2 Werkzeuge/min`
+- Werkzeugkarte nutzt jetzt das echte Schmiede-Lager statt festen UI-Werten
 
 ## Aktuelle Session (April 2026, diese Session)
 
@@ -311,6 +351,12 @@ Kennzahl: `fpc = state.food / totalCitizens()` (Nahrung pro Bürger, alle 3 Schi
 - Naechster Einstieg: `wachstumMittelTick()`, `tickSchichten()` und Anzeige in `renderInfo()` zusammen pruefen
 
 ## TODO - Naechste Session
+
+### Offene Designfragen aus dieser Session
+- Schmiede-Stufen 2 und 3 sauber festlegen
+  aktuell ist nur Stufe 1 inhaltlich bewusst geschärft; die höheren Stufen sind noch provisorisch
+- Prüfen, ob Rohstoffkarten zusätzlich Brutto und Netto anzeigen sollen
+- Optional: feste eigene Detailzeile für Schmiede-Arbeiter im Einwohnerpanel statt nur Zusammenfassungstext
 
 ### Gebaeude-Popup verbessern
 - Breite auf `420px`
